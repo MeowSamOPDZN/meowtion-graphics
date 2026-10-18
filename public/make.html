@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make a video — Meowtion Graphics</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="site"><div class="wrap nav">
+  <a class="logo" href="/"><span class="cube"></span>meowtion graphics</a>
+  <nav><a href="/templates">Templates</a><a href="/#how">How it works</a><a href="/#faq">FAQ</a></nav>
+  <span class="sp"></span>
+</div></header>
+
+<div class="maker">
+  <div class="eyebrow">make a video</div>
+  <h1 style="font-size:34px;letter-spacing:-1px;margin-bottom:26px">Pick a template, write a brief, get your video.</h1>
+  <div class="wizard">
+    <div>
+      <div class="panel" style="margin-bottom:18px">
+        <h3>1 · Template</h3>
+        <div class="pickgrid" id="pickgrid"></div>
+        <div class="field" style="margin-top:14px"><label>Format</label>
+          <div class="row2" id="aspectRow">
+            <button class="chip on" data-a="16:9" type="button">16:9 widescreen</button>
+            <button class="chip" data-a="9:16" type="button">9:16 vertical</button>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>2 · Your brief &amp; brand</h3>
+        <div class="field"><label>What is this video about?</label>
+          <textarea id="brief" placeholder="e.g. A launch video for my bakery's new sourdough line, warm and friendly"></textarea></div>
+        <div class="field"><label>Brand name</label><input type="text" id="brand" placeholder="Your Brand" maxlength="24"></div>
+        <div class="row2">
+          <div class="field"><label>Colour 1</label><input type="color" id="c1" value="#7c5cff"></div>
+          <div class="field"><label>Colour 2</label><input type="color" id="c2" value="#ff7ad9"></div>
+        </div>
+        <div class="field"><label>Logo (optional)</label><input type="file" id="logo" accept="image/*"></div>
+        <button class="btn" id="genBtn" style="width:100%">✨ Generate my video</button>
+        <div class="status" id="status"></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>3 · Preview</h3>
+        <div class="stage" id="stage"><div class="ph">Your animated preview will play here.<br>Pick a template and hit “Generate my video”.</div></div>
+        <div id="editBox" style="display:none;margin-top:18px">
+          <div class="row2">
+            <div class="field"><label>Headline</label><input type="text" id="fHead" maxlength="40"></div>
+            <div class="field"><label>Call to action</label><input type="text" id="fCta" maxlength="24"></div>
+          </div>
+          <div class="field"><label>Subline</label><input type="text" id="fSub" maxlength="70"></div>
+          <div class="actions">
+            <button class="btn ghost small" id="applyBtn" type="button">Apply edits</button>
+            <button class="btn small" id="dlBtn" type="button">⬇ Download video (.webm)</button>
+          </div>
+          <div class="note">Free to make · no sign-up · no watermark. WebM plays in Chrome, Edge, Firefox and uploads to YouTube, X and most editors.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site"><div class="wrap">
+  <a class="logo" href="/" style="font-size:16px"><span class="cube" style="width:20px;height:20px"></span>meowtion graphics</a>
+  <span class="sp"></span><span>By MeowSamOP DZN Studio</span>
+</div></footer>
+<script src="/js/templates.js"></script>
+<script src="/js/make.js"></script>
+</body>
+</html>
