@@ -31,42 +31,43 @@ module.exports = async function (req, res) {
     "Reply with ONLY a JSON object, no markdown fences, no other text:\n" +
     '{"headline":"max 30 chars, punchy","sub":"max 60 chars, one clear sentence","cta":"max 18 chars, e.g. Shop now"}';
 
-  try {
-    var upstream = await fetch(XKIRO_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + key,
-        "User-Agent": UA,
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "system", content: "You are a concise advertising copywriter. You always reply with a single JSON object and nothing else." },
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 220,
-        temperature: 0.8
-      })
-    });
-    var data = await upstream.json().catch(function () { return {}; });
-    if (!upstream.ok) {
-      return res.status(502).json({ error: "AI engine error.", upstreamStatus: upstream.status, detail: clean(JSON.stringify(data), 200) });
-    }
-    var msg = ((data.choices || [])[0] || {}).message || {};
-    // Longcat free models are reasoning models: the answer may land in
-    // reasoning_content with an empty content field.
-    var text = msg.content || msg.reasoning_content || "";
-    var m = text.match(/\{[\s\S]*\}/);
-    var out = {};
-    try { out = JSON.parse(m ? m[0] : text); } catch (e) { out = {}; }
-    return res.status(200).json({
-      headline: clean(out.headline, 34) || "Your headline here",
-      sub: clean(out.sub, 64) || "",
-      cta: clean(out.cta, 22) || "Learn more"
-    });
-  } catch (e) {
-    return res.status(502).json({ error: "AI didn't respond.", reason: clean(String(e && e.message || e), 120) });
+  var out = {};
+  // Longcat is a reasoning model and occasionally returns empty content;
+  // retry a few times before accepting the fallback copy.
+  for (var attempt = 0; attempt < 3; attempt++) {
+    try {
+      var upstream = await fetch(XKIRO_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + key,
+          "User-Agent": UA,
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            { role: "system", content: "You are a concise advertising copywriter. You always reply with a single JSON object and nothing else." },
+            { role: "user", content: prompt }
+          ],
+          max_tokens: 260,
+          temperature: 0.8
+        })
+      });
+      var data = await upstream.json().catch(function () { return {}; });
+      if (!upstream.ok) continue;
+      var msg = ((data.choices || [])[0] || {}).message || {};
+      // Longcat free models put the answer in reasoning_content with empty content.
+      var text = msg.content || msg.reasoning_content || "";
+      var m = text.match(/\{[\s\S]*\}/);
+      try { out = JSON.parse(m ? m[0] : text); } catch (e) { out = {}; }
+      if (out && out.headline && String(out.headline).trim()) break;
+      out = {};
+    } catch (e) { out = {}; }
   }
+  return res.status(200).json({
+    headline: clean(out.headline, 34) || "Your headline here",
+    sub: clean(out.sub, 64) || "",
+    cta: clean(out.cta, 22) || "Learn more"
+  });
 };
