@@ -54,19 +54,18 @@ module.exports = async function (req, res) {
     if (!upstream.ok) {
       return res.status(502).json({ error: "AI engine error.", upstreamStatus: upstream.status, detail: clean(JSON.stringify(data), 200) });
     }
-    var text = ((data.choices || [])[0] || {}).message
-      ? (data.choices[0].message.content || "") : "";
+    var msg = ((data.choices || [])[0] || {}).message || {};
+    // Longcat free models are reasoning models: the answer may land in
+    // reasoning_content with an empty content field.
+    var text = msg.content || msg.reasoning_content || "";
     var m = text.match(/\{[\s\S]*\}/);
     var out = {};
-    var parsed = false;
-    try { out = JSON.parse(m ? m[0] : text); parsed = true; } catch (e) { out = {}; }
-    var resp = {
+    try { out = JSON.parse(m ? m[0] : text); } catch (e) { out = {}; }
+    return res.status(200).json({
       headline: clean(out.headline, 34) || "Your headline here",
       sub: clean(out.sub, 64) || "",
       cta: clean(out.cta, 22) || "Learn more"
-    };
-    if (!parsed) resp.debug = { upstreamOk: upstream.ok, raw: clean(text, 160), keys: Object.keys(data || {}), dataPeek: clean(JSON.stringify(data), 300) };
-    return res.status(200).json(resp);
+    });
   } catch (e) {
     return res.status(502).json({ error: "AI didn't respond.", reason: clean(String(e && e.message || e), 120) });
   }
