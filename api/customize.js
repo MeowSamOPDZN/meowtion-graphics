@@ -65,7 +65,7 @@ module.exports = async function (req, res) {
       sub: clean(out.sub, 64) || "",
       cta: clean(out.cta, 22) || "Learn more"
     };
-    if (!parsed) resp.debug = { upstreamOk: upstream.ok, raw: clean(text, 160) };
+    if (!parsed) resp.debug = { upstreamOk: upstream.ok, raw: clean(text, 160), keys: Object.keys(data || {}), dataPeek: clean(JSON.stringify(data), 300) };
     return res.status(200).json(resp);
   } catch (e) {
     return res.status(502).json({ error: "AI didn't respond.", reason: clean(String(e && e.message || e), 120) });
